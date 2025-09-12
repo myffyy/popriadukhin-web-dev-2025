@@ -106,6 +106,13 @@ footer {
 	padding: 20px;
 }
 
+form {
+	max-width: 500px;
+	margin: 0 auto;
+	background-color: #1e1e1e;
+	padding: 20px;
+	border-radius: 8px;
+}
 footer p {
 	margin: 5px 0;
 }
@@ -118,3 +125,4 @@ footer a {
 footer a:hover {
 	color: #0056b3;
 }
+
