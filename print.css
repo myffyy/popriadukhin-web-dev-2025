@@ -1,0 +1,59 @@
+/* Стили для печати */
+@media print {
+	/* Скрыть ненужные элементы при печати */
+	header nav,
+	.forms-container,
+	footer {
+		display: none;
+	}
+
+	/* Сделать основной контент читаемым */
+	body {
+		font-size: 12pt;
+		color: #000;
+		background-color: #fff;
+	}
+
+	/* Стили для заголовков */
+	h1,
+	h2,
+	h3 {
+		color: #000;
+	}
+
+	/* Стили для таблиц */
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	table,
+	th,
+	td {
+		border: 1pt solid #000;
+	}
+
+	/* Скрыть изображения при печати */
+	img {
+		display: none;
+	}
+
+	/* Сделать формы читаемыми */
+	form {
+		background-color: #fff;
+		border: 1pt solid #000;
+	}
+
+	/* Скрыть кнопки */
+	button {
+		display: none;
+	}
+
+	/* Сброс стилей для печати */
+	* {
+		background: transparent !important;
+		color: black !important;
+		box-shadow: none !important;
+		text-shadow: none !important;
+	}
+}
