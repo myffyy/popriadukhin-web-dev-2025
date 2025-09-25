@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Del&F&Del</title>
 		<link rel="stylesheet" href="styles.css" />
+		<link rel="stylesheet" href="print.css" />
 		<link
 			href="https://fonts.googleapis.com/css2?family=Roboto"
 			rel="stylesheet"
@@ -14,8 +15,8 @@
 		<header>
 			<h1>Del&F&Del</h1>
 			<nav>
-				<a href="#">Главная</a>
-				<a href="#">Меню</a>
+				<a href="index.html">Главная</a>
+				<a href="menu.html">Собрать ланч</a>
 				<a href="#">О нас</a>
 				<a href="#footer">Контакты</a>
 			</nav>
@@ -39,7 +40,7 @@
 					<li>Самые свежие и полезные ингредиенты от лучших поставщиков</li>
 					<li>Самая быстрая доставка по всей Москве</li>
 					<li>
-						Мы используем систему бонусных баллов, благодаря которым вы можете
+						Мы используем систему бонусных баллов, благодаря которой вы можете
 						экономить на ваших заказах
 					</li>
 				</ul>
@@ -73,79 +74,97 @@
 					</tr>
 				</table>
 			</section>
-			<section>
-				<h2>Форма обратной связи</h2>
-				<form
-					action="https://httpbin.org/post"
-					method="post"
-					enctype="multipart/form-data"
-				>
-					<label for="name">ФИО:</label>
-					<input type="text" id="name" name="name" required /><br /><br />
+			<section class="forms-container">
+				<div class="forms-wrapper">
+					<div class="form-block">
+						<form
+							action="https://httpbin.org/post"
+							method="post"
+							enctype="multipart/form-data"
+							class="feedback-form"
+						>
+							<p>Форма обратной связи</p>
+							<label for="name">ФИО:</label>
+							<input type="text" id="name" name="name" required /><br /><br />
 
-					<label for="email">Email:</label>
-					<input type="email" id="email" name="email" required /><br /><br />
+							<label for="email">Email:</label>
+							<input
+								type="email"
+								id="email"
+								name="email"
+								required
+							/><br /><br />
 
-					<label>Откуда узнали о нас:</label><br />
-					<input
-						type="radio"
-						id="social"
-						name="source"
-						value="social"
-						required
-					/>
-					<label for="social">Социальные сети</label><br />
-					<input type="radio" id="friends" name="source" value="friends" />
-					<label for="friends">От друзей</label><br />
-					<input type="radio" id="ads" name="source" value="ads" />
-					<label for="ads">Реклама</label><br /><br />
+							<label>Откуда узнали о нас:</label><br />
+							<input
+								type="radio"
+								id="social"
+								name="source"
+								value="social"
+								required
+							/>
+							<label for="social">Социальные сети</label><br />
+							<input type="radio" id="friends" name="source" value="friends" />
+							<label for="friends">От друзей</label><br />
+							<input type="radio" id="ads" name="source" value="ads" />
+							<label for="ads">Реклама</label><br /><br />
 
-					<label for="type">Тип обращения:</label>
-					<select id="type" name="type" required>
-						<option value="complaint">Жалоба</option>
-						<option value="suggestion">Предложение</option></select
-					><br /><br />
+							<label for="type">Тип обращения:</label>
+							<select id="type" name="type" required>
+								<option value="complaint">Жалоба</option>
+								<option value="suggestion">Предложение</option></select
+							><br /><br />
 
-					<label for="message">Текст сообщения:</label><br />
-					<textarea
-						id="message"
-						name="message"
-						rows="4"
-						cols="50"
-						required
-					></textarea
-					><br /><br />
+							<label for="message">Текст сообщения:</label><br />
+							<textarea
+								id="message"
+								name="message"
+								rows="4"
+								cols="50"
+								required
+							></textarea
+							><br /><br />
 
-					<label for="attachment">Вложения:</label>
-					<input type="file" id="attachment" name="attachment" /><br /><br />
+							<label for="attachment">Вложения:</label>
+							<input
+								type="file"
+								id="attachment"
+								name="attachment"
+							/><br /><br />
 
-					<input type="checkbox" id="agree" name="agree" required />
-					<label for="agree"
-						>Даю согласие на обработку персональных данных</label
-					><br /><br />
+							<input type="checkbox" id="agree" name="agree" required />
+							<label for="agree"
+								>Даю согласие на обработку персональных данных</label
+							><br /><br />
 
-					<input type="submit" value="Отправить" />
-				</form>
-			</section>
-			<section>
-				<h2>Форма аутентификации</h2>
-				<form action="https://httpbin.org/post" method="post">
-					<label for="login">Логин:</label>
-					<input type="text" id="login" name="login" required /><br /><br />
+							<input type="submit" value="Отправить" />
+						</form>
+					</div>
+					<div class="form-block">
+						<form
+							action="https://httpbin.org/post"
+							method="post"
+							class="auth-form"
+						>
+							<p>Форма аутентификации</p>
+							<label for="login">Логин:</label>
+							<input type="text" id="login" name="login" required /><br /><br />
 
-					<label for="password">Пароль:</label>
-					<input
-						type="password"
-						id="password"
-						name="password"
-						required
-					/><br /><br />
+							<label for="password">Пароль:</label>
+							<input
+								type="password"
+								id="password"
+								name="password"
+								required
+							/><br /><br />
 
-					<input type="checkbox" id="remember" name="remember" />
-					<label for="remember">Запомнить меня</label><br /><br />
+							<input type="checkbox" id="remember" name="remember" />
+							<label for="remember">Запомнить меня</label><br /><br />
 
-					<input type="submit" value="Войти" />
-				</form>
+							<input type="submit" value="Войти" />
+						</form>
+					</div>
+				</div>
 			</section>
 		</main>
 		<footer id="footer">
@@ -159,4 +178,3 @@
 		</footer>
 	</body>
 </html>
-
