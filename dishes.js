@@ -1,5 +1,6 @@
 // Массив объектов с информацией о блюдах
 const dishes = [
+	// Супы
 	{
 		keyword: 'tom_yam',
 		name: 'Суп Том-Ям',
@@ -25,6 +26,32 @@ const dishes = [
 		image: 'images/seasoup.jpg',
 	},
 	{
+		keyword: 'borsch',
+		name: 'Борщ',
+		price: 280,
+		category: 'soup',
+		count: '400 г',
+		image: 'images/borch.jpg',
+	},
+	{
+		keyword: 'chicken_noodle_soup',
+		name: 'Куриный суп с лапшой',
+		price: 250,
+		category: 'soup',
+		count: '380 г',
+		image: 'images/chikensoup.jpg',
+	},
+	{
+		keyword: 'gazpacho',
+		name: 'Гаспачо',
+		price: 320,
+		category: 'soup',
+		count: '300 г',
+		image: 'images/gaspacho.jpg',
+	},
+
+	// Горячие блюда
+	{
 		keyword: 'beef_steak',
 		name: 'Мраморный стейк из говядины',
 		price: 700,
@@ -49,6 +76,32 @@ const dishes = [
 		image: 'images/potato.jpg',
 	},
 	{
+		keyword: 'chicken_teriyaki',
+		name: 'Курица Терияки с рисом',
+		price: 480,
+		category: 'main_dish',
+		count: '350 г',
+		image: 'images/teriyaki.jpg',
+	},
+	{
+		keyword: 'fish',
+		name: 'Запеченый лосось',
+		price: 550,
+		category: 'main_dish',
+		count: '400 г',
+		image: 'images/fish.jpg',
+	},
+	{
+		keyword: 'pork_ribs',
+		name: 'Свиные ребрышки BBQ',
+		price: 650,
+		category: 'main_dish',
+		count: '450 г',
+		image: 'images/pork.jpg',
+	},
+
+	// Напитки
+	{
 		keyword: 'fruit_juice',
 		name: 'Сок на выбор',
 		price: 200,
@@ -71,6 +124,130 @@ const dishes = [
 		category: 'drink',
 		count: '300 мл',
 		image: 'images/soda.jpg',
+	},
+	{
+		keyword: 'lemonade',
+		name: 'Домашний лимонад',
+		price: 220,
+		category: 'drink',
+		count: '400 мл',
+		image: 'images/lemonade.jpg',
+	},
+	{
+		keyword: 'green_tea',
+		name: 'Зеленый чай',
+		price: 150,
+		category: 'drink',
+		count: '300 мл',
+		image: 'images/tea.jpg',
+	},
+	{
+		keyword: 'milkshake',
+		name: 'Молочный коктейль',
+		price: 280,
+		category: 'drink',
+		count: '350 мл',
+		image: 'images/milkshake.jpg',
+	},
+
+	// Салаты и стартеры
+	{
+		keyword: 'caesar_salad',
+		name: 'Салат Цезарь',
+		price: 380,
+		category: 'salad',
+		count: '250 г',
+		image: 'images/cesar.jpg',
+	},
+	{
+		keyword: 'greek_salad',
+		name: 'Греческий салат',
+		price: 350,
+		category: 'salad',
+		count: '280 г',
+		image: 'images/greek.jpg',
+	},
+	{
+		keyword: 'bruschetta',
+		name: 'Брускетта с томатами',
+		price: 290,
+		category: 'salad',
+		count: '150 г',
+		image: 'images/bruschetta.jpg',
+	},
+	{
+		keyword: 'caprese',
+		name: 'Салат Капрезе',
+		price: 420,
+		category: 'salad',
+		count: '220 г',
+		image: 'images/caprese.jpg',
+	},
+	{
+		keyword: 'french_fries',
+		name: 'Картофель фри с кислосладким соусом',
+		price: 310,
+		category: 'salad',
+		count: '200 г',
+		image: 'images/fries.jpg',
+	},
+	{
+		keyword: 'onion_rings',
+		name: 'Луковые кольца',
+		price: 250,
+		category: 'salad',
+		count: '180 г',
+		image: 'images/onion.jpg',
+	},
+
+	// Десерты
+	{
+		keyword: 'cheesecake',
+		name: 'Чизкейк',
+		price: 320,
+		category: 'dessert',
+		count: '150 г',
+		image: 'images/cheesecake.jpg',
+	},
+	{
+		keyword: 'tiramisu',
+		name: 'Тирамису',
+		price: 340,
+		category: 'dessert',
+		count: '140 г',
+		image: 'images/tiramisu.jpg',
+	},
+	{
+		keyword: 'apple_pie',
+		name: 'Яблочный пирог',
+		price: 280,
+		category: 'dessert',
+		count: '160 г',
+		image: 'images/applepie.jpg',
+	},
+	{
+		keyword: 'chocolate_fondant',
+		name: 'Шоколадный фондан',
+		price: 360,
+		category: 'dessert',
+		count: '130 г',
+		image: 'images/chocolate.jpg',
+	},
+	{
+		keyword: 'panna_cotta',
+		name: 'Панна-котта',
+		price: 300,
+		category: 'dessert',
+		count: '150 г',
+		image: 'images/pannacotta.jpg',
+	},
+	{
+		keyword: 'ice_cream',
+		name: 'Мороженое',
+		price: 250,
+		category: 'dessert',
+		count: '120 г',
+		image: 'images/icecream.jpg',
 	},
 ]
 
