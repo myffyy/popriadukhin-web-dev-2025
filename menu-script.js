@@ -3,16 +3,16 @@ import dishes from './dishes.js'
 
 // Получаем ссылки на основные элементы
 const dishesContainer = document.getElementById('dishes-container')
+const categoryButtonsContainer = document.getElementById('category-buttons')
 
 // Объект для отслеживания выбранных блюд
 let selectedDishes = {
 	soup: null,
 	main_dish: null,
 	drink: null,
+	salad: null,
+	dessert: null,
 }
-
-// Элемент для отображения итоговой стоимости
-let totalCostElement = null
 
 // Функция для создания карточки блюда
 function createDishCard(dish) {
@@ -58,6 +58,15 @@ function createDishCard(dish) {
 
 // Функция для добавления блюда в заказ
 function addToOrder(dish) {
+	// Если блюдо уже выбрано, убираем его
+	if (
+		selectedDishes[dish.category] &&
+		selectedDishes[dish.category].keyword === dish.keyword
+	) {
+		removeFromOrder(dish.category)
+		return
+	}
+
 	// Удаляем выделение с предыдущего блюда той же категории
 	if (selectedDishes[dish.category]) {
 		const prevDishElement = document.querySelector(
@@ -65,17 +74,44 @@ function addToOrder(dish) {
 		)
 		if (prevDishElement) {
 			prevDishElement.style.border = '2px solid transparent'
+			const prevButton = prevDishElement.querySelector('button')
+			prevButton.textContent = 'Добавить'
+			prevButton.classList.remove('remove-button')
 		}
 	}
 
 	// Сохраняем выбранное блюдо
 	selectedDishes[dish.category] = dish
 
-	// Выделяем новое блюдо
+	// Выделяем новое блюдо и меняем кнопку
 	const dishElement = document.querySelector(`[data-dish="${dish.keyword}"]`)
 	if (dishElement) {
 		dishElement.style.border = '2px solid #bb86fc'
+		const button = dishElement.querySelector('button')
+		button.textContent = 'Убрать'
+		button.classList.add('remove-button')
 	}
+
+	// Обновляем отображение заказа
+	updateOrderDisplay()
+}
+
+// Функция для удаления блюда из заказа
+function removeFromOrder(category) {
+	const dish = selectedDishes[category]
+	if (!dish) return
+
+	// Убираем выделение с карточки и меняем кнопку
+	const dishElement = document.querySelector(`[data-dish="${dish.keyword}"]`)
+	if (dishElement) {
+		dishElement.style.border = '2px solid transparent'
+		const button = dishElement.querySelector('button')
+		button.textContent = 'Добавить'
+		button.classList.remove('remove-button')
+	}
+
+	// Убираем блюдо из выбранных
+	selectedDishes[category] = null
 
 	// Обновляем отображение заказа
 	updateOrderDisplay()
@@ -111,10 +147,12 @@ function updateOrderDisplay() {
 	selectedItemsContainer.appendChild(title)
 
 	// Создаем разделы для каждой категории
-	const categories = ['soup', 'main_dish', 'drink']
+	const categories = ['soup', 'main_dish', 'salad', 'dessert', 'drink']
 	const categoryLabels = {
 		soup: 'Супы',
 		main_dish: 'Горячие блюда',
+		salad: 'Салаты и стартеры',
+		dessert: 'Десерты',
 		drink: 'Напитки',
 	}
 
@@ -130,10 +168,17 @@ function updateOrderDisplay() {
 
 		// Добавляем выбранное блюдо или сообщение
 		if (selectedDishes[category]) {
-			const dishInfo = document.createElement('span')
-			dishInfo.textContent = `${selectedDishes[category].name} - ${selectedDishes[category].price} ₽`
-			dishInfo.style.color = '#bb86fc'
-			categoryDiv.appendChild(dishInfo)
+			const dishInfoSpan = document.createElement('span')
+			dishInfoSpan.textContent = `${selectedDishes[category].name} - ${selectedDishes[category].price} ₽`
+			dishInfoSpan.style.color = '#bb86fc'
+
+			const removeButton = document.createElement('button')
+			removeButton.textContent = '✖'
+			removeButton.className = 'remove-from-order-btn'
+			removeButton.onclick = () => removeFromOrder(category)
+
+			categoryDiv.appendChild(dishInfoSpan)
+			categoryDiv.appendChild(removeButton)
 		} else {
 			const noSelectionMessage = document.createElement('span')
 			noSelectionMessage.textContent =
@@ -151,13 +196,6 @@ function updateOrderDisplay() {
 
 // Функция для расчета и отображения общей стоимости
 function calculateAndDisplayTotal() {
-	// Создаем или получаем элемент для отображения стоимости
-	if (!totalCostElement) {
-		totalCostElement = document.createElement('div')
-		totalCostElement.id = 'total-cost'
-		totalCostElement.className = 'total-cost'
-	}
-
 	// Рассчитываем общую сумму
 	let total = 0
 	Object.values(selectedDishes).forEach(dish => {
@@ -165,6 +203,14 @@ function calculateAndDisplayTotal() {
 			total += dish.price
 		}
 	})
+
+	// Создаем или получаем элемент для отображения стоимости
+	let totalCostElement = document.getElementById('total-cost')
+	if (!totalCostElement) {
+		totalCostElement = document.createElement('div')
+		totalCostElement.id = 'total-cost'
+		totalCostElement.className = 'total-cost'
+	}
 
 	// Обновляем текст стоимости
 	totalCostElement.textContent = `Стоимость заказа: ${total} ₽`
@@ -178,42 +224,54 @@ function calculateAndDisplayTotal() {
 	}
 }
 
-// Функция для отображения всех блюд на странице
-function displayAllDishes() {
+// Функция для отображения блюд по выбранной категории
+function displayDishesByCategory(category) {
 	// Очищаем контейнер перед добавлением новых элементов
 	dishesContainer.innerHTML = ''
 
-	// Создаем контейнеры для каждой категории
-	const categories = ['soup', 'main_dish', 'drink']
+	// Фильтруем блюда по категории и создаем карточки
+	const categoryDishes = dishes.filter(dish => dish.category === category)
+	categoryDishes.forEach(dish => {
+		const card = createDishCard(dish)
+		dishesContainer.appendChild(card)
+	})
+
+	// Обновляем активную кнопку
+	const buttons = document.querySelectorAll('.category-button')
+	buttons.forEach(button => {
+		if (button.dataset.category === category) {
+			button.classList.add('active')
+		} else {
+			button.classList.remove('active')
+		}
+	})
+}
+
+// Функция для создания кнопок категорий
+function createCategoryButtons() {
+	const categories = ['soup', 'main_dish', 'salad', 'dessert', 'drink']
 	const categoryNames = {
 		soup: 'Супы',
 		main_dish: 'Горячие блюда',
 		drink: 'Напитки',
+		salad: 'Салаты и стартеры',
+		dessert: 'Десерты',
 	}
 
 	categories.forEach(category => {
-		// Создаем заголовок категории
-		const categoryHeader = document.createElement('h2')
-		categoryHeader.textContent = categoryNames[category]
-		dishesContainer.appendChild(categoryHeader)
-
-		// Создаем контейнер для карточек категории
-		const categoryContainer = document.createElement('div')
-		categoryContainer.className = 'dishes-container'
-
-		// Фильтруем блюда по категории и создаем карточки
-		const categoryDishes = dishes.filter(dish => dish.category === category)
-		categoryDishes.forEach(dish => {
-			const card = createDishCard(dish)
-			categoryContainer.appendChild(card)
-		})
-
-		dishesContainer.appendChild(categoryContainer)
+		const button = document.createElement('button')
+		button.className = 'category-button'
+		button.textContent = categoryNames[category]
+		button.dataset.category = category
+		button.addEventListener('click', () => displayDishesByCategory(category))
+		categoryButtonsContainer.appendChild(button)
 	})
 }
 
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-	displayAllDishes()
+	createCategoryButtons()
+	// Отображаем первую категорию по умолчанию
+	displayDishesByCategory('soup')
 	updateOrderDisplay()
 })
