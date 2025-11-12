@@ -4,6 +4,17 @@ import dishes from './dishes.js'
 // Получаем ссылки на основные элементы
 const dishesContainer = document.getElementById('dishes-container')
 const categoryButtonsContainer = document.getElementById('category-buttons')
+const comboInfoContainer = document.getElementById('combo-info')
+
+// Определение комбо
+const combos = [
+	{ name: 'Комбо 1', categories: ['soup', 'main_dish', 'salad', 'drink'] },
+	{ name: 'Комбо 2', categories: ['soup', 'main_dish', 'drink'] },
+	{ name: 'Комбо 3', categories: ['soup', 'drink'] },
+	{ name: 'Комбо 4', categories: ['main_dish', 'salad', 'drink'] },
+	{ name: 'Комбо 5', categories: ['main_dish', 'drink'] },
+	{ name: 'Комбо 6', categories: ['salad', 'drink'] },
+]
 
 // Объект для отслеживания выбранных блюд
 let selectedDishes = {
@@ -192,6 +203,78 @@ function updateOrderDisplay() {
 
 	// Рассчитываем и отображаем общую стоимость
 	calculateAndDisplayTotal()
+	// Проверяем комбо
+	checkCombo()
+}
+
+// Функция для проверки комбо
+function checkCombo() {
+	const selectedCategories = Object.keys(selectedDishes).filter(
+		category => selectedDishes[category] !== null
+	)
+
+	let bestMatch = { combo: null, missing: [] }
+	let isCombo = false
+
+	for (const combo of combos) {
+		const missing = combo.categories.filter(
+			cat => !selectedCategories.includes(cat)
+		)
+		const extra = selectedCategories.filter(
+			cat => !combo.categories.includes(cat) && cat !== 'dessert'
+		)
+
+		if (extra.length === 0) {
+			if (
+				bestMatch.combo === null ||
+				missing.length < bestMatch.missing.length
+			) {
+				bestMatch = { combo, missing }
+			}
+		}
+	}
+
+	const selectedItemsContainer = document.getElementById(
+		'selected-items-container'
+	)
+	let comboMessageElement = document.getElementById('combo-message')
+	if (!comboMessageElement) {
+		comboMessageElement = document.createElement('p')
+		comboMessageElement.id = 'combo-message'
+		selectedItemsContainer.appendChild(comboMessageElement)
+	}
+
+	if (bestMatch.combo && bestMatch.missing.length > 0) {
+		const categoryLabels = {
+			soup: 'Суп',
+			main_dish: 'Горячее блюдо',
+			salad: 'Салат/стартер',
+			dessert: 'Десерт',
+			drink: 'Напиток',
+		}
+		const missingLabels = bestMatch.missing.map(cat => categoryLabels[cat])
+		comboMessageElement.textContent = `Добавьте ${missingLabels.join(
+			' / '
+		)} для завершения комбо.`
+		comboMessageElement.style.color = '#ffeb3b'
+	} else if (bestMatch.combo && bestMatch.missing.length === 0) {
+		comboMessageElement.textContent = 'Комбо собрано!'
+		comboMessageElement.style.color = '#4caf50'
+		isCombo = true
+	} else {
+		comboMessageElement.textContent =
+			'Выбранные блюда не соответствуют ни одному комбо.'
+		comboMessageElement.style.color = '#f44336'
+	}
+
+	if (selectedCategories.length === 0) {
+		comboMessageElement.textContent = ''
+	}
+
+	return {
+		isCombo,
+		message: comboMessageElement.textContent,
+	}
 }
 
 // Функция для расчета и отображения общей стоимости
@@ -268,10 +351,85 @@ function createCategoryButtons() {
 	})
 }
 
+// Функция для отображения информации о комбо
+function displayComboInfo() {
+	comboInfoContainer.innerHTML = '' // Очищаем контейнер
+
+	const comboContent = document.createElement('div')
+	comboContent.className = 'combo-content'
+
+	const title = document.createElement('h3')
+	title.textContent = 'Возможные комбо:'
+	comboContent.appendChild(title)
+
+	const comboIconsContainer = document.createElement('div')
+	comboIconsContainer.id = 'combo-icons'
+
+	// --- ВСТАВЬТЕ ССЫЛКИ НА ИКОНКИ ЗДЕСЬ ---
+	const iconPaths = {
+		soup: 'images/soupicon.png',
+		main_dish: 'images/mainicon.png',
+		salad: 'images/saladicon.png',
+		drink: 'images/drinkicon.png',
+		dessert: 'images/desserticon.png',
+	}
+	// -----------------------------------------
+
+	const combosToShow = [
+		['soup', 'main_dish', 'salad', 'drink'],
+		['soup', 'main_dish', 'drink'],
+		['soup', 'drink'],
+		['main_dish', 'salad', 'drink'],
+		['main_dish', 'drink'],
+		['salad', 'drink'],
+		['dessert'],
+	]
+
+	combosToShow.forEach(combo => {
+		const comboDiv = document.createElement('div')
+		comboDiv.className = 'combo-option'
+		combo.forEach((iconKey, index) => {
+			const img = document.createElement('img')
+			img.src = iconPaths[iconKey] // Путь берется из объекта iconPaths
+			img.alt = iconKey
+			img.className = 'combo-icon'
+			comboDiv.appendChild(img)
+
+			if (index < combo.length - 1) {
+				const plus = document.createElement('span')
+				plus.textContent = ' + '
+				plus.className = 'combo-separator'
+				comboDiv.appendChild(plus)
+			}
+		})
+		comboIconsContainer.appendChild(comboDiv)
+	})
+
+	comboContent.appendChild(comboIconsContainer)
+	comboInfoContainer.appendChild(comboContent)
+}
+
 // Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
 	createCategoryButtons()
-	// Отображаем первую категорию по умолчанию
+	displayComboInfo()
 	displayDishesByCategory('soup')
 	updateOrderDisplay()
+
+	const customerForm = document.querySelector('.customer-form')
+	const formErrorMessage = document.getElementById('form-error-message')
+
+	customerForm.addEventListener('submit', event => {
+		const comboCheck = checkCombo()
+		const hasSelectedDishes = Object.values(selectedDishes).some(
+			dish => dish !== null
+		)
+
+		if (hasSelectedDishes && !comboCheck.isCombo) {
+			event.preventDefault() // Отменяем отправку формы
+			formErrorMessage.textContent = comboCheck.message
+		} else {
+			formErrorMessage.textContent = ''
+		}
+	})
 })
