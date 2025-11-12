@@ -160,6 +160,68 @@ form {
 	box-sizing: border-box;
 }
 
+/* Стили для комбо-инфо */
+#combo-info {
+	background-color: #1e1e1e;
+	padding: 20px;
+	border-radius: 15px;
+	margin-bottom: 30px;
+	text-align: center;
+}
+
+#combo-info h3 {
+	margin-top: 0;
+	color: #ffffff;
+}
+
+#combo-info p {
+	color: #b0bec5;
+	margin: 5px 0;
+}
+
+/* Стили для комбо-инфо */
+#combo-info {
+	background-color: #1e1e1e;
+	padding: 20px;
+	border-radius: 15px;
+	margin-bottom: 20px;
+}
+
+#combo-info h3 {
+	margin: 0;
+	color: #ffffff;
+}
+
+#combo-icons {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	column-gap: 60px;
+	row-gap: 15px;
+}
+
+.combo-content {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 20px;
+}
+
+.combo-option {
+	display: flex;
+	align-items: center;
+}
+
+.combo-icon {
+	width: 32px;
+	height: 32px;
+}
+
+.combo-separator {
+	margin: 0 5px;
+	color: #b0bec5;
+}
+
 /* Стили для кнопок категорий */
 #category-buttons {
 	display: flex;
@@ -239,16 +301,17 @@ form {
 }
 
 .weight {
-	.remove-button {
-		background-color: #f44336 !important;
-	}
-
-	.remove-button:hover {
-		background-color: #d32f2f !important;
-	}
 	font-size: 1em;
 	color: #b0bec5;
 	margin: 5px 0;
+}
+
+.remove-button {
+	background-color: #f44336 !important;
+}
+
+.remove-button:hover {
+	background-color: #d32f2f !important;
 }
 
 .dish-item button {
@@ -335,6 +398,12 @@ form {
 	width: 100%;
 	box-sizing: border-box;
 	transition: all 0.3s ease;
+}
+
+.form-error {
+	color: #f44336;
+	margin-bottom: 15px;
+	font-weight: bold;
 }
 
 /* Адаптивность */
