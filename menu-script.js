@@ -1,5 +1,6 @@
 // Импортируем данные о блюдах
-import dishes from './dishes.js'
+// Глобальная переменная для хранения данных о блюдах
+let dishes = []
 
 // Получаем ссылки на основные элементы
 const dishesContainer = document.getElementById('dishes-container')
@@ -8,18 +9,18 @@ const comboInfoContainer = document.getElementById('combo-info')
 
 // Определение комбо
 const combos = [
-	{ name: 'Комбо 1', categories: ['soup', 'main_dish', 'salad', 'drink'] },
-	{ name: 'Комбо 2', categories: ['soup', 'main_dish', 'drink'] },
+	{ name: 'Комбо 1', categories: ['soup', 'main-course', 'salad', 'drink'] },
+	{ name: 'Комбо 2', categories: ['soup', 'main-course', 'drink'] },
 	{ name: 'Комбо 3', categories: ['soup', 'drink'] },
-	{ name: 'Комбо 4', categories: ['main_dish', 'salad', 'drink'] },
-	{ name: 'Комбо 5', categories: ['main_dish', 'drink'] },
+	{ name: 'Комбо 4', categories: ['main-course', 'salad', 'drink'] },
+	{ name: 'Комбо 5', categories: ['main-course', 'drink'] },
 	{ name: 'Комбо 6', categories: ['salad', 'drink'] },
 ]
 
 // Объект для отслеживания выбранных блюд
 let selectedDishes = {
 	soup: null,
-	main_dish: null,
+	'main-course': null,
 	drink: null,
 	salad: null,
 	dessert: null,
@@ -158,10 +159,10 @@ function updateOrderDisplay() {
 	selectedItemsContainer.appendChild(title)
 
 	// Создаем разделы для каждой категории
-	const categories = ['soup', 'main_dish', 'salad', 'dessert', 'drink']
+	const categories = ['soup', 'main-course', 'salad', 'dessert', 'drink']
 	const categoryLabels = {
 		soup: 'Супы',
-		main_dish: 'Горячие блюда',
+		'main-course': 'Горячие блюда',
 		salad: 'Салаты и стартеры',
 		dessert: 'Десерты',
 		drink: 'Напитки',
@@ -247,7 +248,7 @@ function checkCombo() {
 	if (bestMatch.combo && bestMatch.missing.length > 0) {
 		const categoryLabels = {
 			soup: 'Суп',
-			main_dish: 'Горячее блюдо',
+			'main-course': 'Горячее блюдо',
 			salad: 'Салат/стартер',
 			dessert: 'Десерт',
 			drink: 'Напиток',
@@ -332,10 +333,10 @@ function displayDishesByCategory(category) {
 
 // Функция для создания кнопок категорий
 function createCategoryButtons() {
-	const categories = ['soup', 'main_dish', 'salad', 'dessert', 'drink']
+	const categories = ['soup', 'main-course', 'salad', 'dessert', 'drink']
 	const categoryNames = {
 		soup: 'Супы',
-		main_dish: 'Горячие блюда',
+		'main-course': 'Горячие блюда',
 		drink: 'Напитки',
 		salad: 'Салаты и стартеры',
 		dessert: 'Десерты',
@@ -368,7 +369,7 @@ function displayComboInfo() {
 	// --- ВСТАВЬТЕ ССЫЛКИ НА ИКОНКИ ЗДЕСЬ ---
 	const iconPaths = {
 		soup: 'images/soupicon.png',
-		main_dish: 'images/mainicon.png',
+		'main-course': 'images/mainicon.png',
 		salad: 'images/saladicon.png',
 		drink: 'images/drinkicon.png',
 		dessert: 'images/desserticon.png',
@@ -376,11 +377,11 @@ function displayComboInfo() {
 	// -----------------------------------------
 
 	const combosToShow = [
-		['soup', 'main_dish', 'salad', 'drink'],
-		['soup', 'main_dish', 'drink'],
+		['soup', 'main-course', 'salad', 'drink'],
+		['soup', 'main-course', 'drink'],
 		['soup', 'drink'],
-		['main_dish', 'salad', 'drink'],
-		['main_dish', 'drink'],
+		['main-course', 'salad', 'drink'],
+		['main-course', 'drink'],
 		['salad', 'drink'],
 		['dessert'],
 	]
@@ -410,10 +411,32 @@ function displayComboInfo() {
 }
 
 // Инициализация при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
+// Асинхронная функция для загрузки данных о блюдах с сервера
+async function loadDishes() {
+	const url = 'https://edu.std-900.ist.mospolytech.ru/labs/api/dishes'
+	try {
+		const response = await fetch(url)
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`)
+		}
+		const data = await response.json()
+		dishes = data // Заменяем локальные данные данными с сервера
+	} catch (error) {
+		console.error('Ошибка при загрузке данных о блюдах:', error)
+		// Можно вывести сообщение об ошибке на страницу
+		dishesContainer.innerHTML =
+			'<p>Не удалось загрузить меню. Пожалуйста, попробуйте обновить страницу позже.</p>'
+	}
+}
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', async () => {
+	await loadDishes() // Ожидаем загрузки данных
+
+	// После загрузки данных инициализируем остальные компоненты
 	createCategoryButtons()
 	displayComboInfo()
-	displayDishesByCategory('soup')
+	displayDishesByCategory('soup') // Отображаем супы по умолчанию
 	updateOrderDisplay()
 
 	const customerForm = document.querySelector('.customer-form')
