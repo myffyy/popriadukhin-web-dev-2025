@@ -1,59 +1,173 @@
-/* Стили для печати */
 @media print {
-	/* Скрыть ненужные элементы при печати */
-	header nav,
-	.forms-container,
-	footer {
-		display: none;
-	}
-
-	/* Сделать основной контент читаемым */
 	body {
 		font-size: 12pt;
 		color: #000;
 		background-color: #fff;
+		font-family: 'Times New Roman', Times, serif;
 	}
 
-	/* Стили для заголовков */
 	h1,
 	h2,
 	h3 {
 		color: #000;
 	}
 
-	/* Стили для таблиц */
+	header nav,
+	footer,
+	.customer-form,
+	#category-buttons,
+	.dishes-container,
+	.dish-item button,
+	.checkout-panel,
+	.modal.fade,
+	.order-actions,
+	.action-btn,
+	.form-block,
+	.btn {
+		display: none;
+	}
+
+	/* Стили для заголовков на странице меню */
+	#combo-info h3 {
+		color: #000;
+	}
+
+	a {
+		color: #000 !important;
+		text-decoration: none;
+	}
+
+	section img {
+		display: none;
+	}
+
 	table {
-		border-collapse: collapse;
 		width: 100%;
+		border-collapse: collapse;
 	}
 
 	table,
 	th,
 	td {
 		border: 1pt solid #000;
+		padding: 5px;
 	}
 
-	/* Скрыть изображения при печати */
-	img {
-		display: none;
-	}
-
-	/* Сделать формы читаемыми */
-	form {
+	#combo-info,
+	.selected-items-column {
+		border: 1pt solid #000;
+		padding: 10px;
 		background-color: #fff;
+	}
+
+	.selected-items-column h3,
+	.selected-items-column p,
+	.selected-items-column .total-cost {
+		color: #000 !important;
+	}
+
+	.combo-icon {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		filter: grayscale(100%);
+	}
+
+	/* Стили для модального окна деталей заказа */
+	.modal-content {
+		display: block !important;
+		position: static !important;
+		background-color: #fff !important;
+		border: 1pt solid #000;
+		padding: 10px;
+		margin: 20px 0;
+	}
+
+	.modal-header,
+	.modal-body,
+	.modal-footer {
+		display: block !important;
+		background-color: #fff !important;
+	}
+
+	.modal-header {
+		border-bottom: 1pt solid #000;
+		padding-bottom: 10px;
+		margin-bottom: 10px;
+	}
+
+	.modal-footer {
+		border-top: 1pt solid #000;
+		padding-top: 10px;
+		margin-top: 10px;
+	}
+
+	/* Стили для таблицы заказов */
+	.table-responsive {
+		overflow: visible;
+	}
+
+	.table th,
+	.table td {
+		color: #000;
+		background-color: #fff !important;
 		border: 1pt solid #000;
 	}
 
-	/* Скрыть кнопки */
-	button {
-		display: none;
+	.table-striped tbody tr:nth-of-type(odd) {
+		background-color: #f2f2f2 !important;
 	}
 
-	/* Сброс стилей для печати */
-	* {
-		background: transparent !important;
-		color: black !important;
-		box-shadow: none !important;
-		text-shadow: none !important;
+	/* Стили для карточек блюд при печати */
+	.dish-item {
+		background-color: #fff;
+		border: 1pt solid #000;
+		padding: 10px;
+		margin-bottom: 10px;
+		color: #000;
+	}
+
+	.dish-item .price,
+	.dish-item .dish-name,
+	.dish-item .weight {
+		color: #000;
+	}
+
+	/* Стили для карточек блюд в контейнере заказа */
+	#order-items-container .dish-item {
+		display: block;
+		background-color: #fff;
+		border: 1pt solid #000;
+		padding: 10px;
+		margin-bottom: 10px;
+		color: #000;
+	}
+
+	#order-items-container .dish-item img {
+		display: block;
+		max-width: 100px;
+		height: auto;
+		margin: 0 auto 10px;
+	}
+
+	#order-items-container .dish-item .price,
+	#order-items-container .dish-item .dish-name,
+	#order-items-container .dish-item .weight {
+		color: #000;
+		text-align: center;
+	}
+
+	/* Стили для карточки с итогами заказа */
+	#form-order-summary {
+		background-color: #fff;
+		border: 1pt solid #000;
+		padding: 15px;
+		margin-bottom: 20px;
+	}
+
+	#form-order-summary h3,
+	#form-order-summary p,
+	#form-order-summary .total-cost {
+		color: #000;
 	}
 }
