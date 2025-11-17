@@ -1,5 +1,5 @@
-// Глобальная переменная для хранения данных о блюдах
-let dishes = []
+import { checkCombo, createElement, dishes, loadDishes } from './utils.js'
+
 // Глобальная переменная для хранения выбранных блюд
 let selectedDishes = {}
 
@@ -7,16 +7,6 @@ let selectedDishes = {}
 const orderItemsContainer = document.getElementById('order-items-container')
 const customerForm = document.querySelector('.customer-form')
 const formErrorMessage = document.getElementById('form-error-message')
-
-// --- Определение комбо ---
-const combos = [
-	{ name: 'Комбо 1', categories: ['soup', 'main-course', 'salad', 'drink'] },
-	{ name: 'Комбо 2', categories: ['soup', 'main-course', 'drink'] },
-	{ name: 'Комбо 3', categories: ['soup', 'drink'] },
-	{ name: 'Комбо 4', categories: ['main-course', 'salad', 'drink'] },
-	{ name: 'Комбо 5', categories: ['main-course', 'drink'] },
-	{ name: 'Комбо 6', categories: ['salad', 'drink'] },
-]
 
 // --- Функции для работы с localStorage ---
 
@@ -33,17 +23,6 @@ function saveOrderToLocalStorage() {
 		}
 	}
 	localStorage.setItem('currentOrder', JSON.stringify(orderToSave))
-}
-
-// --- Функции для создания DOM-элементов ---
-
-function createElement(tag, attributes, ...children) {
-	const element = document.createElement(tag)
-	Object.assign(element, attributes)
-	if (children.length > 0) {
-		element.append(...children)
-	}
-	return element
 }
 
 // --- Функции для отображения и управления заказом ---
@@ -140,52 +119,17 @@ function renderFormSummary() {
 	summaryContainer.appendChild(totalEl)
 }
 
-function checkCombo() {
-	const selectedCategories = Object.keys(selectedDishes).filter(
-		category => selectedDishes[category] !== null && category !== 'dessert'
-	)
-
-	const selectedSet = new Set(selectedCategories)
-
-	for (const combo of combos) {
-		const comboSet = new Set(combo.categories)
-		if (
-			selectedSet.size === comboSet.size &&
-			[...selectedSet].every(cat => comboSet.has(cat))
-		) {
-			return {
-				isCombo: true,
-				message: 'Комбо собрано!',
-			}
-		}
-	}
-
-	return {
-		isCombo: false,
-		message: 'Выбранные блюда не соответствуют ни одному комбо.',
-	}
-}
-
 // --- Инициализация ---
-
-async function loadDishes() {
-	const url = 'https://edu.std-900.ist.mospolytech.ru/labs/api/dishes'
-	try {
-		const response = await fetch(url)
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`)
-		}
-		const data = await response.json()
-		dishes = data
-	} catch (error) {
-		console.error('Ошибка при загрузке данных о блюдах:', error)
-		orderItemsContainer.innerHTML =
-			'<p>Не удалось загрузить меню. Пожалуйста, попробуйте обновить страницу позже.</p>'
-	}
-}
 
 document.addEventListener('DOMContentLoaded', async () => {
 	await loadDishes()
+
+	if (dishes.length === 0) {
+		orderItemsContainer.innerHTML =
+			'<p>Не удалось загрузить меню. Пожалуйста, попробуйте обновить страницу позже.</p>'
+		return
+	}
+
 	const savedOrder = loadOrderFromLocalStorage()
 
 	for (const category in savedOrder) {
@@ -202,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	customerForm.addEventListener('submit', event => {
 		event.preventDefault()
 
-		const comboCheck = checkCombo()
+		const comboCheck = checkCombo(selectedDishes)
 		const hasSelectedDishes = Object.values(selectedDishes).some(
 			dish => dish !== null
 		)
@@ -219,41 +163,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		formErrorMessage.textContent = ''
 
-		// Этап 4: Отправка данных на сервер
 		const formData = new FormData(customerForm)
 		const orderData = {
+			id: Date.now(),
+			date: new Date().toISOString(),
 			...Object.fromEntries(formData.entries()),
 			dishes: Object.values(selectedDishes)
 				.filter(d => d)
 				.map(d => d.keyword),
 		}
 
-		fetch('https://httpbin.org/post', {
-			method: 'POST',
-			body: JSON.stringify(orderData),
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		})
-			.then(response => {
-				if (!response.ok) {
-					throw new Error(`Ошибка сети: ${response.status}`)
-				}
-				return response.json()
-			})
-			.then(data => {
-				console.log('Success:', data)
-				alert('Заказ успешно оформлен!')
-				localStorage.removeItem('currentOrder')
-				selectedDishes = {}
-				renderOrderItems()
-				renderFormSummary()
-				customerForm.reset()
-			})
-			.catch(error => {
-				console.error('Error:', error)
-				alert(`Произошла ошибка при оформлении заказа: ${error.message}`)
-			})
+		try {
+			const allOrders = JSON.parse(localStorage.getItem('allOrders')) || []
+			allOrders.push(orderData)
+			localStorage.setItem('allOrders', JSON.stringify(allOrders))
+
+			localStorage.removeItem('currentOrder')
+			selectedDishes = {}
+			renderOrderItems()
+			renderFormSummary()
+			customerForm.reset()
+
+			alert('Заказ успешно оформлен!')
+		} catch (error) {
+			console.error('Error:', error)
+			alert(`Произошла ошибка при сохранении заказа: ${error.message}`)
+		}
 	})
 })
 
