@@ -1,98 +1,60 @@
-import { checkCombo, createElement, dishes, loadDishes } from './utils.js'
+import {
+	checkCombo,
+	createDishCard,
+	createElement,
+	dishes,
+	loadDishes,
+	loadFromStorage,
+	saveToStorage,
+} from './utils.js'
 
-// Глобальная переменная для хранения выбранных блюд
 let selectedDishes = {}
 
-// --- Основные DOM-элементы ---
 const orderItemsContainer = document.getElementById('order-items-container')
 const customerForm = document.querySelector('.customer-form')
 const formErrorMessage = document.getElementById('form-error-message')
+const deliveryTimeSelect = document.getElementById('delivery-time')
+const specificTimeContainer = document.getElementById('specific-time-container')
 
-// --- Функции для работы с localStorage ---
-
-function loadOrderFromLocalStorage() {
-	const savedOrder = localStorage.getItem('currentOrder')
-	return savedOrder ? JSON.parse(savedOrder) : {}
-}
-
-function saveOrderToLocalStorage() {
+function saveOrder() {
 	const orderToSave = {}
 	for (const category in selectedDishes) {
-		if (selectedDishes[category]) {
+		if (selectedDishes[category])
 			orderToSave[category] = selectedDishes[category].keyword
-		}
 	}
-	localStorage.setItem('currentOrder', JSON.stringify(orderToSave))
-}
-
-// --- Функции для отображения и управления заказом ---
-
-function createDishCard(dish) {
-	const img = createElement('img', { src: dish.image, alt: dish.name })
-	const price = createElement('p', {
-		className: 'price',
-		textContent: `${dish.price} ₽`,
-	})
-	const name = createElement('p', {
-		className: 'dish-name',
-		textContent: dish.name,
-	})
-	const weight = createElement('p', {
-		className: 'weight',
-		textContent: dish.count,
-	})
-	const button = createElement('button', {
-		textContent: 'Удалить',
-		className: 'remove-button',
-		onclick: () => removeFromOrder(dish.category),
-	})
-
-	const dishItem = createElement(
-		'div',
-		{ className: 'dish-item' },
-		img,
-		price,
-		name,
-		weight,
-		button
-	)
-	dishItem.dataset.dish = dish.keyword
-
-	return dishItem
+	saveToStorage('currentOrder', orderToSave)
 }
 
 function removeFromOrder(category) {
 	selectedDishes[category] = null
-	saveOrderToLocalStorage()
+	saveOrder()
 	renderOrderItems()
 	renderFormSummary()
 }
 
 function renderOrderItems() {
-	orderItemsContainer.innerHTML = ''
-	const orderedDishes = Object.values(selectedDishes).filter(
-		dish => dish !== null
-	)
+	const orderedDishes = Object.values(selectedDishes).filter(dish => dish)
 
 	if (orderedDishes.length === 0) {
-		orderItemsContainer.innerHTML = `<p>Ничего не выбрано. Чтобы добавить блюда в заказ, перейдите на страницу <a href="menu.html">Собрать ланч</a>.</p>`
+		orderItemsContainer.innerHTML =
+			'<p>Ничего не выбрано. Чтобы добавить блюда в заказ, перейдите на страницу <a href="menu.html">Собрать ланч</a>.</p>'
 		return
 	}
 
+	orderItemsContainer.innerHTML = ''
 	orderedDishes.forEach(dish => {
-		const card = createDishCard(dish)
-		orderItemsContainer.appendChild(card)
+		const card = createDishCard(dish, 'Удалить', () =>
+			removeFromOrder(dish.category)
+		)
+		card.querySelector('button').className = 'remove-button'
+		orderItemsContainer.appendChild(
+			createElement('div', { className: 'col' }, card)
+		)
 	})
 }
 
 function renderFormSummary() {
 	const summaryContainer = document.getElementById('form-order-summary')
-	summaryContainer.innerHTML = ''
-
-	const title = createElement('h3', { textContent: 'Состав заказа' })
-	summaryContainer.appendChild(title)
-
-	const categories = ['soup', 'main-course', 'salad', 'dessert', 'drink']
 	const categoryLabels = {
 		soup: 'Суп',
 		'main-course': 'Горячее блюдо',
@@ -101,25 +63,30 @@ function renderFormSummary() {
 		drink: 'Напиток',
 	}
 
+	summaryContainer.innerHTML = ''
+	summaryContainer.appendChild(
+		createElement('h3', { textContent: 'Состав заказа', className: 'my-4' })
+	)
+
 	let total = 0
-	categories.forEach(category => {
+	Object.entries(categoryLabels).forEach(([category, label]) => {
 		const dish = selectedDishes[category]
 		const text = dish ? `${dish.name} - ${dish.price} ₽` : 'Не выбрано'
 		total += dish ? dish.price : 0
-		const p = createElement('p', {
-			textContent: `${categoryLabels[category]}: ${text}`,
+		summaryContainer.appendChild(
+			createElement('p', { textContent: `${label}: ${text}` })
+		)
+	})
+
+	summaryContainer.appendChild(
+		createElement('p', {
+			textContent: `Итого: ${total} ₽`,
+			className: 'total-cost',
+			style:
+				'margin-top: auto; font-weight: bold; text-align: center; padding-top: 15px;',
 		})
-		summaryContainer.appendChild(p)
-	})
-
-	const totalEl = createElement('p', {
-		textContent: `Итого: ${total} ₽`,
-		className: 'total-cost',
-	})
-	summaryContainer.appendChild(totalEl)
+	)
 }
-
-// --- Инициализация ---
 
 document.addEventListener('DOMContentLoaded', async () => {
 	await loadDishes()
@@ -130,32 +97,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return
 	}
 
-	const savedOrder = loadOrderFromLocalStorage()
-
-	for (const category in savedOrder) {
-		const dishKeyword = savedOrder[category]
-		const dish = dishes.find(d => d.keyword === dishKeyword)
-		if (dish) {
-			selectedDishes[category] = dish
+	const savedOrder = loadFromStorage('currentOrder')
+	if (savedOrder) {
+		for (const category in savedOrder) {
+			const dish = dishes.find(d => d.keyword === savedOrder[category])
+			if (dish) selectedDishes[category] = dish
 		}
 	}
 
 	renderOrderItems()
 	renderFormSummary()
 
+	deliveryTimeSelect.addEventListener('change', e => {
+		specificTimeContainer.style.display =
+			e.target.value === 'time' ? 'block' : 'none'
+	})
+
 	customerForm.addEventListener('submit', event => {
 		event.preventDefault()
 
-		const comboCheck = checkCombo(selectedDishes)
-		const hasSelectedDishes = Object.values(selectedDishes).some(
-			dish => dish !== null
-		)
-
+		const hasSelectedDishes = Object.values(selectedDishes).some(dish => dish)
 		if (!hasSelectedDishes) {
 			formErrorMessage.textContent = 'Вы не выбрали ни одного блюда.'
 			return
 		}
 
+		const comboCheck = checkCombo(selectedDishes)
 		if (!comboCheck.isCombo) {
 			formErrorMessage.textContent = comboCheck.message
 			return
@@ -163,20 +130,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		formErrorMessage.textContent = ''
 
-		const formData = new FormData(customerForm)
 		const orderData = {
 			id: Date.now(),
 			date: new Date().toISOString(),
-			...Object.fromEntries(formData.entries()),
+			...Object.fromEntries(new FormData(customerForm)),
 			dishes: Object.values(selectedDishes)
 				.filter(d => d)
 				.map(d => d.keyword),
 		}
 
 		try {
-			const allOrders = JSON.parse(localStorage.getItem('allOrders')) || []
+			const allOrders = loadFromStorage('allOrders') || []
 			allOrders.push(orderData)
-			localStorage.setItem('allOrders', JSON.stringify(allOrders))
+			saveToStorage('allOrders', allOrders)
 
 			localStorage.removeItem('currentOrder')
 			selectedDishes = {}
@@ -190,15 +156,4 @@ document.addEventListener('DOMContentLoaded', async () => {
 			alert(`Произошла ошибка при сохранении заказа: ${error.message}`)
 		}
 	})
-})
-
-const deliveryTimeSelect = document.getElementById('delivery-time')
-const specificTimeContainer = document.getElementById('specific-time-container')
-
-deliveryTimeSelect.addEventListener('change', event => {
-	if (event.target.value === 'time') {
-		specificTimeContainer.style.display = 'block'
-	} else {
-		specificTimeContainer.style.display = 'none'
-	}
 })
