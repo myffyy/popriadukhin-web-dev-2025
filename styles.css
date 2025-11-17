@@ -135,15 +135,16 @@ footer a:hover {
 	margin: 0 auto;
 }
 
-.form-block {
+/* --- Общие компоненты-карточки --- */
+.card {
 	background-color: #1e1e1e;
 	padding: 20px;
 	border-radius: 35px;
 	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
 	width: 100%;
 	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 .form-block h3 {
@@ -165,7 +166,7 @@ form {
 	background-color: #1e1e1e;
 	padding: 20px;
 	border-radius: 15px;
-	margin-bottom: 30px;
+	margin-bottom: 20px;
 	text-align: center;
 }
 
@@ -177,19 +178,6 @@ form {
 #combo-info p {
 	color: #b0bec5;
 	margin: 5px 0;
-}
-
-/* Стили для комбо-инфо */
-#combo-info {
-	background-color: #1e1e1e;
-	padding: 20px;
-	border-radius: 15px;
-	margin-bottom: 20px;
-}
-
-#combo-info h3 {
-	margin: 0;
-	color: #ffffff;
 }
 
 #combo-icons {
@@ -332,18 +320,6 @@ form {
 	transform: scale(1.05);
 }
 
-/* Стили для колонки с выбранными блюдами */
-.selected-items-column {
-	background-color: #1e1e1e;
-	padding: 20px;
-	border-radius: 35px;
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-	height: 100%;
-}
-
 .selected-items-column h3 {
 	color: #ffffff;
 	margin-top: 0;
@@ -370,7 +346,7 @@ form {
 .remove-from-order-btn:hover {
 	color: #d32f2f;
 }
-.selected-items-column div {
+.selected-items-column .category-item {
 	margin-bottom: 5px;
 	width: 100%;
 	transition: all 0.3s ease;
@@ -444,13 +420,9 @@ form {
 		align-items: center;
 	}
 
-	.dish-item {
-		width: 100%;
-		max-width: 300px;
-	}
-
 	.forms-wrapper {
-		flex-direction: column;
+		grid-template-columns: 1fr; /* Уже установлено ранее, можно убрать */
+		flex-direction: column; /* Это свойство для flex, а у нас grid. Удаляем. */
 	}
 
 	.form-block {
@@ -493,4 +465,169 @@ form {
 		width: 100%;
 		box-sizing: border-box;
 	}
+}
+
+/* Стили для панели оформления заказа */
+.checkout-panel {
+	position: sticky;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: #1e1e1e;
+	padding: 20px;
+	box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+	z-index: 1000;
+	transition: transform 0.3s ease;
+	transform: translateY(100%); /* Скрыто по умолчанию */
+}
+
+.checkout-panel.visible {
+	transform: translateY(0);
+}
+
+.checkout-panel p {
+	margin: 0;
+	font-size: 1.2em;
+	color: #ffffff;
+}
+
+.checkout-panel a {
+	background-color: #bb86fc;
+	color: #ffffff;
+	padding: 10px 20px;
+	border-radius: 10px;
+	text-decoration: none;
+	font-weight: bold;
+	transition: background-color 0.3s ease;
+}
+
+.checkout-panel a:hover {
+	background-color: #9543f9;
+}
+
+.checkout-panel a.disabled {
+	background-color: #555;
+	color: #aaa;
+	pointer-events: none;
+	cursor: not-allowed;
+}
+
+.order-form-wrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+}
+
+.customer-form label {
+	display: block;
+	margin-bottom: 5px;
+}
+
+.customer-form input[type='text'],
+.customer-form input[type='email'],
+.customer-form input[type='tel'],
+.customer-form select {
+	width: 100%;
+	padding: 8px;
+	box-sizing: border-box;
+	margin-bottom: 10px;
+}
+
+/* Стили для полей и кнопок формы */
+.customer-form input[type='text'],
+.customer-form input[type='email'],
+.customer-form input[type='tel'],
+.customer-form select,
+.customer-form textarea {
+	background-color: #333;
+	border: 1px solid #555;
+	color: #e0e0e0;
+	padding: 10px;
+	border-radius: 5px;
+	width: 100%;
+	box-sizing: border-box;
+	margin-bottom: 15px;
+}
+
+.customer-form input[type='submit'],
+.customer-form input[type='reset'] {
+	background-color: #bb86fc;
+	color: #ffffff;
+	border: none;
+	padding: 12px 20px;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 1em;
+	font-weight: bold;
+	transition: background-color 0.3s ease;
+	margin-right: 10px;
+}
+
+.customer-form input[type='submit']:hover {
+	background-color: #9543f9;
+}
+
+.customer-form input[type='reset'] {
+	background-color: #444;
+}
+
+.customer-form input[type='reset']:hover {
+	background-color: #555;
+}
+
+/* Стили для кастомного чекбокса */
+.customer-form input[type='checkbox'] {
+	display: none; /* Скрываем стандартный чекбокс */
+}
+
+.customer-form input[type='checkbox'] + label {
+	position: relative;
+	padding-left: 30px; /* Отступ для кастомного чекбокса */
+	cursor: pointer;
+	user-select: none;
+	display: inline-flex;
+	align-items: center;
+	height: 20px;
+}
+
+.customer-form input[type='checkbox'] + label::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 20px;
+	height: 20px;
+	border: 2px solid #bb86fc;
+	background-color: #333;
+	border-radius: 5px;
+	transition: all 0.2s ease;
+}
+
+.customer-form input[type='checkbox']:checked + label::before {
+	background-color: #bb86fc;
+	border-color: #bb86fc;
+}
+
+.customer-form input[type='checkbox']:checked + label::after {
+	content: '✔';
+	position: absolute;
+	left: 5px;
+	top: 1px;
+	color: #ffffff;
+	font-size: 16px;
+}
+
+.customer-form div,
+.feedback-form div,
+.auth-form div {
+	margin-bottom: 15px;
+}
+
+.customer-form label,
+.feedback-form label,
+.auth-form label {
+	margin-right: 10px;
 }
