@@ -1,5 +1,11 @@
-// Глобальная переменная для хранения данных о блюдах
-let dishes = []
+import {
+	checkCombo,
+	combos,
+	createElement,
+	dishes,
+	loadDishes,
+} from './utils.js'
+
 // Объект для отслеживания выбранных блюд
 let selectedDishes = {
 	soup: null,
@@ -17,16 +23,6 @@ const checkoutPanel = document.getElementById('checkout-panel')
 const panelTotalCost = document.getElementById('panel-total-cost')
 const checkoutLink = document.getElementById('checkout-link')
 
-// --- Определение комбо ---
-const combos = [
-	{ name: 'Комбо 1', categories: ['soup', 'main-course', 'salad', 'drink'] },
-	{ name: 'Комбо 2', categories: ['soup', 'main-course', 'drink'] },
-	{ name: 'Комбо 3', categories: ['soup', 'drink'] },
-	{ name: 'Комбо 4', categories: ['main-course', 'salad', 'drink'] },
-	{ name: 'Комбо 5', categories: ['main-course', 'drink'] },
-	{ name: 'Комбо 6', categories: ['salad', 'drink'] },
-]
-
 // --- Функции для работы с localStorage ---
 
 function saveOrderToLocalStorage() {
@@ -42,17 +38,6 @@ function saveOrderToLocalStorage() {
 function loadOrderFromLocalStorage() {
 	const savedOrder = localStorage.getItem('currentOrder')
 	return savedOrder ? JSON.parse(savedOrder) : null
-}
-
-// --- Утилиты для создания DOM-элементов ---
-
-function createElement(tag, attributes, ...children) {
-	const element = document.createElement(tag)
-	Object.assign(element, attributes)
-	if (children.length > 0) {
-		element.append(...children)
-	}
-	return element
 }
 
 // --- Функции для управления карточками блюд ---
@@ -150,7 +135,7 @@ function updateCheckoutPanel() {
 	const total = selected.reduce((sum, dish) => sum + dish.price, 0)
 	panelTotalCost.textContent = total
 
-	const { isCombo } = checkCombo()
+	const { isCombo } = checkCombo(selectedDishes)
 	if (isCombo) {
 		checkoutLink.classList.remove('disabled')
 		checkoutLink.href = 'order.html'
@@ -158,25 +143,6 @@ function updateCheckoutPanel() {
 		checkoutLink.classList.add('disabled')
 		checkoutLink.removeAttribute('href')
 	}
-}
-
-function checkCombo() {
-	const selectedCategories = Object.keys(selectedDishes).filter(
-		category => selectedDishes[category] !== null && category !== 'dessert'
-	)
-	const selectedSet = new Set(selectedCategories)
-
-	for (const combo of combos) {
-		const comboSet = new Set(combo.categories)
-		if (
-			selectedSet.size === comboSet.size &&
-			[...selectedSet].every(cat => comboSet.has(cat))
-		) {
-			return { isCombo: true }
-		}
-	}
-
-	return { isCombo: false }
 }
 
 function displayDishesByCategory(category) {
@@ -262,23 +228,14 @@ function displayComboInfo() {
 
 // --- Инициализация ---
 
-async function loadDishes() {
-	const url = 'https://edu.std-900.ist.mospolytech.ru/labs/api/dishes'
-	try {
-		const response = await fetch(url)
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`)
-		}
-		dishes = await response.json()
-	} catch (error) {
-		console.error('Ошибка при загрузке данных о блюдах:', error)
-		dishesContainer.innerHTML =
-			'<p>Не удалось загрузить меню. Пожалуйста, попробуйте обновить страницу позже.</p>'
-	}
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
 	await loadDishes()
+
+	if (dishes.length === 0) {
+		dishesContainer.innerHTML =
+			'<p>Не удалось загрузить меню. Пожалуйста, попробуйте обновить страницу позже.</p>'
+		return
+	}
 
 	const savedOrder = loadOrderFromLocalStorage()
 	if (savedOrder) {
