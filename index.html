@@ -17,7 +17,8 @@
 			<nav>
 				<a href="index.html">Главная</a>
 				<a href="menu.html">Собрать ланч</a>
-				<a href="#">О нас</a>
+				<a href="order.html">Оформить заказ</a>
+				<a href="#about">О нас</a>
 				<a href="#footer">Контакты</a>
 			</nav>
 		</header>
@@ -76,7 +77,7 @@
 			</section>
 			<section class="forms-container">
 				<div class="forms-wrapper">
-					<div class="form-block">
+					<div class="card form-block">
 						<form
 							action="https://httpbin.org/post"
 							method="post"
@@ -84,82 +85,90 @@
 							class="feedback-form"
 						>
 							<p>Форма обратной связи</p>
-							<label for="name">ФИО:</label>
-							<input type="text" id="name" name="name" required /><br /><br />
+							<div>
+								<label for="name">ФИО:</label>
+								<input type="text" id="name" name="name" required />
+							</div>
 
-							<label for="email">Email:</label>
-							<input
-								type="email"
-								id="email"
-								name="email"
-								required
-							/><br /><br />
+							<div>
+								<label for="email">Email:</label>
+								<input type="email" id="email" name="email" required />
+							</div>
 
-							<label>Откуда узнали о нас:</label><br />
-							<input
-								type="radio"
-								id="social"
-								name="source"
-								value="social"
-								required
-							/>
-							<label for="social">Социальные сети</label><br />
-							<input type="radio" id="friends" name="source" value="friends" />
-							<label for="friends">От друзей</label><br />
-							<input type="radio" id="ads" name="source" value="ads" />
-							<label for="ads">Реклама</label><br /><br />
+							<div>
+								<label>Откуда узнали о нас:</label>
+								<input
+									type="radio"
+									id="social"
+									name="source"
+									value="social"
+									required
+								/>
+								<label for="social">Социальные сети</label>
+								<input
+									type="radio"
+									id="friends"
+									name="source"
+									value="friends"
+								/>
+								<label for="friends">От друзей</label>
+								<input type="radio" id="ads" name="source" value="ads" />
+								<label for="ads">Реклама</label>
+							</div>
 
-							<label for="type">Тип обращения:</label>
-							<select id="type" name="type" required>
-								<option value="complaint">Жалоба</option>
-								<option value="suggestion">Предложение</option></select
-							><br /><br />
+							<div>
+								<label for="type">Тип обращения:</label>
+								<select id="type" name="type" required>
+									<option value="complaint">Жалоба</option>
+									<option value="suggestion">Предложение</option>
+								</select>
+							</div>
 
-							<label for="message">Текст сообщения:</label><br />
-							<textarea
-								id="message"
-								name="message"
-								rows="4"
-								cols="50"
-								required
-							></textarea
-							><br /><br />
+							<div>
+								<label for="message">Текст сообщения:</label>
+								<textarea
+									id="message"
+									name="message"
+									rows="4"
+									cols="50"
+									required
+								></textarea>
+							</div>
 
-							<label for="attachment">Вложения:</label>
-							<input
-								type="file"
-								id="attachment"
-								name="attachment"
-							/><br /><br />
+							<div>
+								<label for="attachment">Вложения:</label>
+								<input type="file" id="attachment" name="attachment" />
+							</div>
 
-							<input type="checkbox" id="agree" name="agree" required />
-							<label for="agree"
-								>Даю согласие на обработку персональных данных</label
-							><br /><br />
+							<div>
+								<input type="checkbox" id="agree" name="agree" required />
+								<label for="agree"
+									>Даю согласие на обработку персональных данных</label
+								>
+							</div>
 
 							<input type="submit" value="Отправить" />
 						</form>
 					</div>
-					<div class="form-block">
+					<div class="card form-block">
 						<form
 							action="https://httpbin.org/post"
 							method="post"
 							class="auth-form"
 						>
 							<p>Форма аутентификации</p>
-							<label for="login">Логин:</label>
-							<input type="text" id="login" name="login" required /><br /><br />
-
-							<label for="password">Пароль:</label>
-							<input
-								type="password"
-								id="password"
-								name="password"
-								required
-							/><br /><br />
-
-							<input type="checkbox" id="remember" name="remember" />
-							<label for="remember">Запомнить меня</label><br /><br />
+							<div>
+								<label for="login">Логин:</label>
+								<input type="text" id="login" name="login" required />
+							</div>
+							<div>
+								<label for="password">Пароль:</label>
+								<input type="password" id="password" name="password" required />
+							</div>
+							<div>
+								<input type="checkbox" id="remember" name="remember" />
+								<label for="remember">Запомнить меня</label>
+							</div>
 
 							<input type="submit" value="Войти" />
 						</form>
