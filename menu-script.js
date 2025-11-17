@@ -1,12 +1,14 @@
 import {
 	checkCombo,
 	combos,
+	createDishCard,
 	createElement,
 	dishes,
 	loadDishes,
+	loadFromStorage,
+	saveToStorage,
 } from './utils.js'
 
-// Объект для отслеживания выбранных блюд
 let selectedDishes = {
 	soup: null,
 	'main-course': null,
@@ -15,7 +17,6 @@ let selectedDishes = {
 	dessert: null,
 }
 
-// --- Основные DOM-элементы ---
 const dishesContainer = document.getElementById('dishes-container')
 const categoryButtonsContainer = document.getElementById('category-buttons')
 const comboInfoContainer = document.getElementById('combo-info')
@@ -23,60 +24,19 @@ const checkoutPanel = document.getElementById('checkout-panel')
 const panelTotalCost = document.getElementById('panel-total-cost')
 const checkoutLink = document.getElementById('checkout-link')
 
-// --- Функции для работы с localStorage ---
-
-function saveOrderToLocalStorage() {
+function saveOrder() {
 	const orderToSave = {}
 	for (const category in selectedDishes) {
-		if (selectedDishes[category]) {
+		if (selectedDishes[category])
 			orderToSave[category] = selectedDishes[category].keyword
-		}
 	}
-	localStorage.setItem('currentOrder', JSON.stringify(orderToSave))
-}
-
-function loadOrderFromLocalStorage() {
-	const savedOrder = localStorage.getItem('currentOrder')
-	return savedOrder ? JSON.parse(savedOrder) : null
-}
-
-// --- Функции для управления карточками блюд ---
-
-function createDishCard(dish) {
-	const img = createElement('img', { src: dish.image, alt: dish.name })
-	const price = createElement('p', {
-		className: 'price',
-		textContent: `${dish.price} ₽`,
-	})
-	const name = createElement('p', {
-		className: 'dish-name',
-		textContent: dish.name,
-	})
-	const weight = createElement('p', {
-		className: 'weight',
-		textContent: dish.count,
-	})
-	const button = createElement('button', {
-		textContent: 'Добавить',
-		onclick: () => addToOrder(dish),
-	})
-
-	const dishItem = createElement(
-		'div',
-		{ className: 'dish-item' },
-		img,
-		price,
-		name,
-		weight,
-		button
-	)
-	dishItem.dataset.dish = dish.keyword
-
-	return dishItem
+	saveToStorage('currentOrder', orderToSave)
 }
 
 function updateDishCardAppearance(keyword, isSelected) {
-	const dishElement = document.querySelector(`[data-dish="${keyword}"]`)
+	const dishElement = document.querySelector(
+		`.dish-item[data-dish="${keyword}"]`
+	)
 	if (!dishElement) return
 
 	const button = dishElement.querySelector('button')
@@ -87,26 +47,22 @@ function updateDishCardAppearance(keyword, isSelected) {
 	button.classList.toggle('remove-button', isSelected)
 }
 
-// --- Функции для управления состоянием заказа ---
-
 function addToOrder(dish) {
 	const { category, keyword } = dish
 	const currentlySelected = selectedDishes[category]
 
-	if (currentlySelected && currentlySelected.keyword === keyword) {
+	if (currentlySelected?.keyword === keyword) {
 		removeFromOrder(category)
 		return
 	}
 
-	if (currentlySelected) {
+	if (currentlySelected)
 		updateDishCardAppearance(currentlySelected.keyword, false)
-	}
 
 	selectedDishes[category] = dish
 	updateDishCardAppearance(keyword, true)
-
 	updateCheckoutPanel()
-	saveOrderToLocalStorage()
+	saveOrder()
 }
 
 function removeFromOrder(category) {
@@ -115,15 +71,12 @@ function removeFromOrder(category) {
 
 	updateDishCardAppearance(dish.keyword, false)
 	selectedDishes[category] = null
-
 	updateCheckoutPanel()
-	saveOrderToLocalStorage()
+	saveOrder()
 }
 
-// --- Функции для обновления UI ---
-
 function updateCheckoutPanel() {
-	const selected = Object.values(selectedDishes).filter(d => d !== null)
+	const selected = Object.values(selectedDishes).filter(d => d)
 
 	if (selected.length === 0) {
 		checkoutPanel.classList.remove('visible')
@@ -131,9 +84,10 @@ function updateCheckoutPanel() {
 	}
 
 	checkoutPanel.classList.add('visible')
-
-	const total = selected.reduce((sum, dish) => sum + dish.price, 0)
-	panelTotalCost.textContent = total
+	panelTotalCost.textContent = selected.reduce(
+		(sum, dish) => sum + dish.price,
+		0
+	)
 
 	const { isCombo } = checkCombo(selectedDishes)
 	if (isCombo) {
@@ -147,32 +101,37 @@ function updateCheckoutPanel() {
 
 function displayDishesByCategory(category) {
 	dishesContainer.innerHTML = ''
-	const categoryDishes = dishes.filter(dish => dish.category === category)
-	categoryDishes.forEach(dish => {
-		const card = createDishCard(dish)
-		dishesContainer.appendChild(card)
+	dishes
+		.filter(dish => dish.category === category)
+		.forEach(dish => {
+			const card = createDishCard(dish, 'Добавить', () => addToOrder(dish))
+			dishesContainer.appendChild(
+				createElement('div', { className: 'col' }, card)
+			)
+		})
+
+	Object.values(selectedDishes).forEach(dish => {
+		if (dish) updateDishCardAppearance(dish.keyword, true)
 	})
 
-	const buttons = document.querySelectorAll('.category-button')
-	buttons.forEach(button => {
+	document.querySelectorAll('.category-button').forEach(button => {
 		button.classList.toggle('active', button.dataset.category === category)
 	})
 }
 
 function createCategoryButtons() {
-	const categories = ['soup', 'main-course', 'salad', 'dessert', 'drink']
-	const categoryNames = {
+	const categories = {
 		soup: 'Супы',
 		'main-course': 'Горячие блюда',
-		drink: 'Напитки',
 		salad: 'Салаты и стартеры',
 		dessert: 'Десерты',
+		drink: 'Напитки',
 	}
 
-	categories.forEach(category => {
+	Object.entries(categories).forEach(([category, name]) => {
 		const button = createElement('button', {
 			className: 'category-button',
-			textContent: categoryNames[category],
+			textContent: name,
 			onclick: () => displayDishesByCategory(category),
 		})
 		button.dataset.category = category
@@ -181,8 +140,6 @@ function createCategoryButtons() {
 }
 
 function displayComboInfo() {
-	comboInfoContainer.innerHTML = ''
-	const title = createElement('h3', { textContent: 'Возможные комбо:' })
 	const iconPaths = {
 		soup: 'images/soupicon.png',
 		'main-course': 'images/mainicon.png',
@@ -192,7 +149,6 @@ function displayComboInfo() {
 	}
 
 	const allCombos = [...combos.map(c => c.categories), ['dessert']]
-
 	const comboIcons = allCombos.map(comboKeys => {
 		const icons = comboKeys.flatMap((iconKey, index) => {
 			const img = createElement('img', {
@@ -200,33 +156,45 @@ function displayComboInfo() {
 				alt: iconKey,
 				className: 'combo-icon',
 			})
-			if (index < comboKeys.length - 1) {
-				const plus = createElement('span', {
-					textContent: ' + ',
-					className: 'combo-separator',
-				})
-				return [img, plus]
-			}
-			return [img]
+			return index < comboKeys.length - 1
+				? [
+						img,
+						createElement('span', {
+							textContent: ' + ',
+							className: 'combo-separator',
+						}),
+				  ]
+				: [img]
 		})
 		return createElement('div', { className: 'combo-option' }, ...icons)
 	})
 
+	const comboElementsWithSeparators = comboIcons.flatMap((combo, index) =>
+		index < comboIcons.length - 1
+			? [
+					combo,
+					createElement('span', {
+						textContent: '|',
+						className: 'combo-separator',
+						style: 'margin: 0 10px;',
+					}),
+			  ]
+			: [combo]
+	)
+
 	const comboIconsContainer = createElement(
 		'div',
 		{ id: 'combo-icons' },
-		...comboIcons
+		...comboElementsWithSeparators
 	)
 	const comboContent = createElement(
 		'div',
 		{ className: 'combo-content' },
-		title,
+		createElement('h3', { textContent: 'Возможные комбо:' }),
 		comboIconsContainer
 	)
 	comboInfoContainer.appendChild(comboContent)
 }
-
-// --- Инициализация ---
 
 document.addEventListener('DOMContentLoaded', async () => {
 	await loadDishes()
@@ -237,25 +205,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return
 	}
 
-	const savedOrder = loadOrderFromLocalStorage()
+	const savedOrder = loadFromStorage('currentOrder')
 	if (savedOrder) {
 		for (const category in savedOrder) {
-			const dishKeyword = savedOrder[category]
-			const dish = dishes.find(d => d.keyword === dishKeyword)
-			if (dish) {
-				selectedDishes[category] = dish
-			}
+			const dish = dishes.find(d => d.keyword === savedOrder[category])
+			if (dish) selectedDishes[category] = dish
 		}
 	}
 
 	createCategoryButtons()
 	displayComboInfo()
 	displayDishesByCategory('soup')
-
-	Object.values(selectedDishes).forEach(dish => {
-		if (dish) {
-			updateDishCardAppearance(dish.keyword, true)
-		}
-	})
 	updateCheckoutPanel()
 })
